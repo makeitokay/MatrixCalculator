@@ -13,8 +13,7 @@ namespace MatrixCalculator
     /// </summary>
     class Program
     {
-        // Разбиение операций на категории
-        private static readonly List<Operation> CalculationOperations = new()
+        private static readonly List<Operation> RequiringMainMatrix = new()
         {
             Operation.MatrixTrace,
             Operation.MatrixTranspose,
@@ -24,11 +23,9 @@ namespace MatrixCalculator
             Operation.MatrixMultiplyingByNumber,
             Operation.MatrixDeterminant,
             Operation.SystemOfAlgebraicEquations,
+            Operation.SwapMainAndAdditionalMatrix
         };
         
-        private static readonly List<Operation> RequiringMainMatrix = 
-            CalculationOperations.Concat(new []{ Operation.SwapMainAndAdditionalMatrix }).ToList();
-
         private static readonly List<Operation> RequiringAdditionalMatrix = new()
         {
             Operation.MatrixAddition,
@@ -97,63 +94,45 @@ namespace MatrixCalculator
                     GetMatrixInput(out additionalMatrix);
                 }
                 
-                // Отдельно обрабатываются операции, требующие вычислений.
-                if (CalculationOperations.Contains(userOperationInput))
-                    HandleCalculateOperation(userOperationInput, ref mainMatrix, ref additionalMatrix);
-                else
-                    HandleNonCalculateOperation(userOperationInput, ref mainMatrix, ref additionalMatrix);
+                HandleOperation(userOperationInput, ref mainMatrix, ref additionalMatrix);
                 
             } while (userOperationInput != Operation.ProgramExit);
         }
 
         /// <summary>
-        /// Обработка операций, не требующих вычислений.
+        /// Обработка операций.
         /// </summary>
         /// <param name="operation">Операция, которую необходимо обработать.</param>
         /// <param name="mainMatrix">Ссылка на основную матрицу.</param>
         /// <param name="additionalMatrix">Ссылка на дополнительную матрицу.</param>
-        static void HandleNonCalculateOperation(Operation operation, ref Matrix mainMatrix, ref Matrix additionalMatrix)
+        static void HandleOperation(Operation operation, ref Matrix mainMatrix, ref Matrix additionalMatrix)
         {
-            switch (operation)
-            {
-                case Operation.ChangeRandomGeneration:
-                    RandomGenerationInput();
-                    break;
-                case Operation.MainMatrixInput:
-                    GetMatrixInput(out mainMatrix);
-                    break;
-                case Operation.AdditionalMatrixInput:
-                    GetMatrixInput(out additionalMatrix);
-                    break;
-                case Operation.PrintMainMatrix:
-                    PrintMatrix(mainMatrix);
-                    break;
-                case Operation.PrintAdditionalMatrix:
-                    PrintMatrix(additionalMatrix);
-                    break;
-                case Operation.SwapMainAndAdditionalMatrix:
-                    (mainMatrix, additionalMatrix) = (additionalMatrix, mainMatrix);
-                    PrintInfoMessage("Успешно! Основная и дополнительная матрицы поменялись местами.");
-                    break;
-                case Operation.PrintOperations:
-                    PrintOperations();
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Обработка операций, требующих вычислений.
-        /// </summary>
-        /// <param name="operation">Операция, которую необходимо обработать.</param>
-        /// <param name="mainMatrix">Ссылка на основную матрицу.</param>
-        /// <param name="additionalMatrix">Ссылка на дополнительную матрицу.</param>
-        static void HandleCalculateOperation(Operation operation, ref Matrix mainMatrix, ref Matrix additionalMatrix)
-        {
-            // try-catch необходим, чтобы не возникло ошибки переполнения при вычислениях.
             try
             {
                 switch (operation)
                 {
+                    case Operation.ChangeRandomGeneration:
+                        RandomGenerationInput();
+                        break;
+                    case Operation.MainMatrixInput:
+                        GetMatrixInput(out mainMatrix);
+                        break;
+                    case Operation.AdditionalMatrixInput:
+                        GetMatrixInput(out additionalMatrix);
+                        break;
+                    case Operation.PrintMainMatrix:
+                        PrintMatrix(mainMatrix);
+                        break;
+                    case Operation.PrintAdditionalMatrix:
+                        PrintMatrix(additionalMatrix);
+                        break;
+                    case Operation.SwapMainAndAdditionalMatrix:
+                        (mainMatrix, additionalMatrix) = (additionalMatrix, mainMatrix);
+                        PrintInfoMessage("Успешно! Основная и дополнительная матрицы поменялись местами.");
+                        break;
+                    case Operation.PrintOperations:
+                        PrintOperations();
+                        break;
                     case Operation.MatrixTrace:
                         HandleMatrixTrace(ref mainMatrix);
                         break;
@@ -518,7 +497,7 @@ namespace MatrixCalculator
         /// <param name="row">Строка чисел.</param>
         /// <param name="result">Массив, в который необходимо записать результат.</param>
         /// <returns>true или false в зависимости от успешности парсинга.</returns>
-        static bool ParseStringOfNumbers(string? row, out decimal[] result)
+        static bool ParseStringOfNumbers(string row, out decimal[] result)
         {
             var arrayOfRowElements = row?.Split(" ");
             if (arrayOfRowElements == null)
