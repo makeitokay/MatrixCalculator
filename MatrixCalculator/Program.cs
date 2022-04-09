@@ -721,7 +721,7 @@ namespace MatrixCalculator
             for (var i = 0; i < matrix.Rows; i++)
             {
                 for (var j = 0; j < matrix.Columns; j++)
-                    Console.Write(matrix.GetValue(i, j) + (j == matrix.Columns - 1 ? "\n" : "\t"));
+                    Console.Write(matrix[i, j] + (j == matrix.Columns - 1 ? "\n" : "\t"));
             }
 
             Console.WriteLine("======");

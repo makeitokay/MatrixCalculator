@@ -24,6 +24,17 @@ namespace MatrixCalculator
         }
 
         /// <summary>
+        /// Индексатор для работы с значениями матрицы.
+        /// </summary>
+        /// <param name="rowIndex">Индекс строки.</param>
+        /// <param name="columnIndex">Индекс столбца.</param>
+        public decimal this[int rowIndex, int columnIndex]
+        {
+            get => _matrix[rowIndex, columnIndex];
+            set => _matrix[rowIndex, columnIndex] = value;
+        } 
+
+        /// <summary>
         /// Сообщает, пустая ли матрица.
         /// </summary>
         /// <returns>true, если матрица пустая; иначе false.</returns>
@@ -54,25 +65,6 @@ namespace MatrixCalculator
         }
 
         /// <summary>
-        /// Устанавливает значение для конкретного элемента матрицы.
-        /// </summary>
-        /// <param name="rowIndex">Индекс строки.</param>
-        /// <param name="columnIndex">Индекс столбца.</param>
-        /// <param name="value">Значение.</param>
-        public void SetValue(int rowIndex, int columnIndex, decimal value)
-        {
-            _matrix[rowIndex, columnIndex] = value;
-        }
-
-        /// <summary>
-        /// Отдает конкретное значение матрицы.
-        /// </summary>
-        /// <param name="rowIndex">Индекс строки.</param>
-        /// <param name="columnIndex">Индекс столбца.</param>
-        /// <returns>Значение, лежащее в ячейке с переданными параметрами.</returns>
-        public decimal GetValue(int rowIndex, int columnIndex) => _matrix[rowIndex, columnIndex];
-
-        /// <summary>
         /// Вычисляет след матрицы. Только для квадратных матриц.
         /// </summary>
         /// <returns>След матрицы.</returns>
@@ -82,7 +74,7 @@ namespace MatrixCalculator
 
             for (int i = 0; i < Math.Min(Rows, Columns); i++)
             {
-                trace += GetValue(i, i);
+                trace += this[i, i];
             }
 
             return trace;
@@ -98,7 +90,7 @@ namespace MatrixCalculator
             for (int j = 0; j < Columns; j++)
             {
                 for (int i = 0; i < Rows; i++)
-                    resultMatrix.SetValue(j, i, GetValue(i, j));
+                    resultMatrix[j, i] = this[i, j];
             }
 
             return resultMatrix;
@@ -118,7 +110,7 @@ namespace MatrixCalculator
             for (int i = 0; i < firstMatrix.Rows; i++)
             {
                 for (int j = 0; j < firstMatrix.Columns; j++)
-                    resultMatrix.SetValue(i, j, firstMatrix.GetValue(i, j) + secondMatrix.GetValue(i, j));
+                    resultMatrix[i, j] = firstMatrix[i, j] + secondMatrix[i, j];
             }
 
             return resultMatrix;
@@ -138,7 +130,7 @@ namespace MatrixCalculator
             for (int i = 0; i < firstMatrix.Rows; i++)
             {
                 for (int j = 0; j < firstMatrix.Columns; j++)
-                    resultMatrix.SetValue(i, j, firstMatrix.GetValue(i, j) - secondMatrix.GetValue(i, j));
+                    resultMatrix[i, j] = firstMatrix[i, j] - secondMatrix[i, j];
             }
 
             return resultMatrix;
@@ -159,10 +151,9 @@ namespace MatrixCalculator
             {
                 for (int j = 0; j < secondMatrix.Columns; j++)
                 {
-                    resultMatrix.SetValue(i, j, 0);
+                    resultMatrix[i, j] = 0;
                     for (int k = 0; k < secondMatrix.Rows; k++)
-                        resultMatrix.SetValue(i, j, 
-                            resultMatrix.GetValue(i, j) + firstMatrix.GetValue(i, k) * secondMatrix.GetValue(k, j));
+                        resultMatrix[i, j] += firstMatrix[i, k] * secondMatrix[k, j];
                 }
             }
 
@@ -182,7 +173,7 @@ namespace MatrixCalculator
             for (int i = 0; i < resultMatrix.Rows; i++)
             {
                 for (int j = 0; j < resultMatrix.Columns; j++)
-                    resultMatrix.SetValue(i, j, matrix.GetValue(i, j) * value);
+                    resultMatrix[i, j] = matrix[i, j] * value;
             }
 
             return resultMatrix;
@@ -205,7 +196,7 @@ namespace MatrixCalculator
                 {
                     if (i == rowIndex || j == columnIndex)
                         continue;
-                    resultMatrix.SetValue(currentRow, currentColumn, GetValue(i, j));
+                    resultMatrix[currentRow, currentColumn] = this[i, j];
                     currentColumn += 1;
                     if (currentColumn != Columns - 1) 
                         continue;
@@ -227,7 +218,7 @@ namespace MatrixCalculator
                 return 0m;
 
             if (Rows == 1)
-                return GetValue(0, 0);
+                return this[0, 0];
             
             decimal determinant = 0;
             int currentSign = 1;
@@ -235,7 +226,7 @@ namespace MatrixCalculator
             for (int i = 0; i < Rows; i++)
             {
                 Matrix minorMatrix = GetMinorMatrix(0, i);
-                determinant += currentSign * GetValue(0, i) * minorMatrix.GetDeterminant();
+                determinant += currentSign * this[0, i] * minorMatrix.GetDeterminant();
                 currentSign = -currentSign;
             }
 
@@ -260,7 +251,7 @@ namespace MatrixCalculator
                 {
                     if (j != columnIndex)
                     {
-                        resultMatrix.SetValue(i, currentColumn, GetValue(i, j));
+                        resultMatrix[i, currentColumn] = this[i, j];
                         currentColumn += 1;
                         continue;
                     }
@@ -268,7 +259,7 @@ namespace MatrixCalculator
                     if (columnValues == null)
                         continue;
                     
-                    resultMatrix.SetValue(i, currentColumn, columnValues[i]);
+                    resultMatrix[i, currentColumn] = columnValues[i];
                     currentColumn += 1;
                 }
             }
@@ -288,7 +279,7 @@ namespace MatrixCalculator
 
             for (int i = 0; i < Rows; i++)
             {
-                result[i] = GetValue(i, columnIndex);
+                result[i] = this[i, columnIndex];
             }
 
             return result;
