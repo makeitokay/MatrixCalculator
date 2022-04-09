@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using MatrixCalculator.Exceptions;
 
 namespace MatrixCalculator
 {
@@ -70,6 +71,9 @@ namespace MatrixCalculator
         /// <returns>След матрицы.</returns>
         public decimal GetTrace()
         {
+            if (!IsSquare())
+                throw new MatrixIsNotSquareException("Вычислить след неквадратной матрицы невозможно.");
+            
             decimal trace = 0;
 
             for (int i = 0; i < Math.Min(Rows, Columns); i++)
@@ -104,7 +108,8 @@ namespace MatrixCalculator
         /// <returns>Результирующая матрица.</returns>
         public static Matrix operator +(Matrix firstMatrix, Matrix secondMatrix)
         {
-            if (!firstMatrix.SizeEquals(secondMatrix)) return new Matrix();
+            if (!firstMatrix.SizeEquals(secondMatrix)) 
+                throw new MatrixSizesAreNotEqualException("Матрицы должны быть одного размера.");
 
             Matrix resultMatrix = new Matrix(firstMatrix.Rows, firstMatrix.Columns);
             for (int i = 0; i < firstMatrix.Rows; i++)
@@ -124,7 +129,8 @@ namespace MatrixCalculator
         /// <returns>Результирующая матрица.</returns>
         public static Matrix operator -(Matrix firstMatrix, Matrix secondMatrix)
         {
-            if (!firstMatrix.SizeEquals(secondMatrix)) return new Matrix();
+            if (!firstMatrix.SizeEquals(secondMatrix)) 
+                throw new MatrixSizesAreNotEqualException("Матрицы должны быть одного размера.");;
 
             Matrix resultMatrix = new Matrix(firstMatrix.Rows, firstMatrix.Columns);
             for (int i = 0; i < firstMatrix.Rows; i++)
@@ -144,7 +150,8 @@ namespace MatrixCalculator
         /// <returns>Результирующая матрица.</returns>
         public static Matrix operator *(Matrix firstMatrix, Matrix secondMatrix)
         {
-            if (firstMatrix.Columns != secondMatrix.Rows) return new Matrix();
+            if (firstMatrix.Columns != secondMatrix.Rows) 
+                throw new MatrixMultiplicationIsNotPossibleException("Размеры матриц несовместимы с умножением.");
 
             Matrix resultMatrix = new Matrix(firstMatrix.Rows, secondMatrix.Columns);
             for (int i = 0; i < firstMatrix.Rows; i++)
@@ -214,8 +221,8 @@ namespace MatrixCalculator
         /// <returns>Определитель матрицы.</returns>
         public decimal GetDeterminant()
         {
-            if (Rows != Columns) 
-                return 0m;
+            if (!IsSquare())
+                throw new MatrixIsNotSquareException("Определитель существует только для квадратных матриц.");
 
             if (Rows == 1)
                 return this[0, 0];
@@ -288,10 +295,16 @@ namespace MatrixCalculator
         /// <summary>
         /// Решение СЛАУ по методу Крамера.
         /// </summary>
-        /// <param name="solveResult">Массив, в который необходимо записать решения СЛАУ.</param>
+        /// <param name="solveResult">Массив, в который необходимо записать решение СЛАУ.</param>
         /// <returns>Количество решений: 0, 1 или бесконечность.</returns>
         public double CramerMethod(out decimal[] solveResult)
         {
+            if (Rows != Columns - 1)
+                throw new MatrixCramerMethodIsNotPossibleException(
+                    "Решить такую СЛАУ методом Крамера невозможно, т.к. определителя для " + 
+                    "неквадратных матриц не существует.\nМатрица должна состоять из " +
+                    "n x n коэффициентов неизвестных и столбца свободных членов.");
+            
             solveResult = new decimal[Rows];
 
             Matrix coefficientsMatrix = ReplaceColumn(Columns - 1);

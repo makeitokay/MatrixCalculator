@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using MatrixCalculator.Exceptions;
 
 namespace MatrixCalculator
 {
@@ -191,13 +192,14 @@ namespace MatrixCalculator
         /// <param name="mainMatrix">Ссылка на основную матрицу.</param>
         private static void HandleMatrixTrace(ref Matrix mainMatrix)
         {
-            if (!mainMatrix.IsSquare())
+            try
             {
-                PrintInfoMessage("Вычислить след матрицы невозможно для неквадратной матрицы!");
-                return;
+                PrintInfoMessage($"След матрицы = {mainMatrix.GetTrace()}");
             }
-
-            PrintInfoMessage($"След матрицы = {mainMatrix.GetTrace()}");
+            catch (MatrixIsNotSquareException exception)
+            {
+                PrintInfoMessage(exception.Message);
+            }
         }
 
         /// <summary>
@@ -221,13 +223,16 @@ namespace MatrixCalculator
         /// <param name="additionalMatrix">Ссылка на дополнительную матрицу.</param>
         private static void HandleMatrixAddition(ref Matrix mainMatrix, ref Matrix additionalMatrix)
         {
-            if (!mainMatrix.SizeEquals(additionalMatrix))
+            Matrix resultOfSum;
+            try
             {
-                PrintInfoMessage("Невозможно выполнить сложение для матриц разных размерностей.");
+                resultOfSum = mainMatrix + additionalMatrix;
+            }
+            catch (MatrixSizesAreNotEqualException exception)
+            {
+                PrintInfoMessage(exception.Message);
                 return;
             }
-
-            Matrix resultOfSum = mainMatrix + additionalMatrix;
             PrintMatrix(resultOfSum, "Результат выполнения: сумма основной и дополнительной матриц");
             AskAboutMatrixOverwrite(ref mainMatrix, ref additionalMatrix, ref resultOfSum);
         }
@@ -239,13 +244,16 @@ namespace MatrixCalculator
         /// <param name="additionalMatrix">Ссылка на дополнительную матрицу.</param>
         private static void HandleMatrixDifference(ref Matrix mainMatrix, ref Matrix additionalMatrix)
         {
-            if (!mainMatrix.SizeEquals(additionalMatrix))
+            Matrix resultOfDifference;
+            try
             {
-                PrintInfoMessage("Невозможно выполнить вычитание для матриц разных размерностей.");
+                resultOfDifference = mainMatrix - additionalMatrix;
+            }
+            catch (MatrixSizesAreNotEqualException exception)
+            {
+                PrintInfoMessage(exception.Message);
                 return;
             }
-
-            Matrix resultOfDifference = mainMatrix - additionalMatrix;
             PrintMatrix(resultOfDifference, "Результат выполнения: разность основной и дополнительной матриц");
             AskAboutMatrixOverwrite(ref mainMatrix, ref additionalMatrix, ref resultOfDifference);
         }
@@ -257,14 +265,16 @@ namespace MatrixCalculator
         /// <param name="additionalMatrix">Ссылка на дополнительную матрицу.</param>
         private static void HandleMatrixMultiplication(ref Matrix mainMatrix, ref Matrix additionalMatrix)
         {
-            if (mainMatrix.Columns != additionalMatrix.Rows)
+            Matrix resultOfMultiplication;
+            try
             {
-                PrintInfoMessage("Невозможно выполнить умножение: количество столбцов основной матрицы " +
-                                 "не совпадает с количеством строк дополнительной матрицы.");
+                resultOfMultiplication = mainMatrix * additionalMatrix;
+            }
+            catch (MatrixMultiplicationIsNotPossibleException exception)
+            {
+                PrintInfoMessage(exception.Message);
                 return;
             }
-
-            Matrix resultOfMultiplication = mainMatrix * additionalMatrix;
             PrintMatrix(resultOfMultiplication, "Результат выполнения: " +
                                                 "произведение основной и дополнительной матриц");
             AskAboutMatrixOverwrite(ref mainMatrix, ref additionalMatrix, ref resultOfMultiplication);
@@ -293,12 +303,14 @@ namespace MatrixCalculator
         /// <param name="mainMatrix">Ссылка на основную матрицу.</param>
         private static void HandleMatrixDeterminant(ref Matrix mainMatrix)
         {
-            if (!mainMatrix.IsSquare())
+            try
             {
-                PrintInfoMessage("Невозможно вычислить определитель для неквадратной матрицы.");
-                return;
+                PrintInfoMessage($"Определитель матрицы = {mainMatrix.GetDeterminant()}");
             }
-            PrintInfoMessage($"Определитель матрицы = {mainMatrix.GetDeterminant()}");
+            catch (MatrixIsNotSquareException exception)
+            {
+                PrintInfoMessage(exception.Message);
+            }
         }
 
         /// <summary>
@@ -307,16 +319,17 @@ namespace MatrixCalculator
         /// <param name="mainMatrix">Ссылка на основную матрицу.</param>
         private static void HandleSystemOfAlgebraicEquations(ref Matrix mainMatrix)
         {
-            // Вычисляем только для матриц размера (N, N + 1).
-            if (mainMatrix.Rows != mainMatrix.Columns - 1)
+            double solveCount;
+            decimal[] solveResult;
+            try
             {
-                PrintInfoMessage("Решить такую СЛАУ методом Крамера невозможно, т.к. определителя для " +
-                                 "неквадратных матриц не существует.\nОсновная матрица должна состоять из " +
-                                 "n x n коэффициентов неизвестных и столбца свободных членов.");
+                solveCount = mainMatrix.CramerMethod(out solveResult);
+            }
+            catch (MatrixCramerMethodIsNotPossibleException exception)
+            {
+                PrintInfoMessage(exception.Message);
                 return;
             }
-
-            double solveCount = mainMatrix.CramerMethod(out var solveResult);
             if (solveCount == 0)
             {
                 PrintInfoMessage("Данная система не имеет решений.");
@@ -327,8 +340,7 @@ namespace MatrixCalculator
                 PrintInfoMessage("Данная система имеет бесконечно много решений.");
                 return;
             }
-                        
-
+            
             string resultText = "";
             for (int i = 0; i < solveResult.Length; i++)
                 resultText += $"x{i + 1} = {solveResult[i]};" + (i != solveResult.Length - 1 ? "\n" : "");
