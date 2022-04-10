@@ -31,7 +31,7 @@ namespace MatrixCalculator
         public decimal this[int rowIndex, int columnIndex]
         {
             get => _matrix[rowIndex, columnIndex];
-            set => _matrix[rowIndex, columnIndex] = value;
+            private set => _matrix[rowIndex, columnIndex] = value;
         } 
 
         /// <summary>
@@ -44,14 +44,14 @@ namespace MatrixCalculator
         /// Сообщает, квадратная ли матрица.
         /// </summary>
         /// <returns>true, если матрица квадратная; иначе false.</returns>
-        public bool IsSquare() => Rows == Columns;
+        private bool IsSquare() => Rows == Columns;
 
         /// <summary>
         /// Сообщает, равны ли размеры матриц.
         /// </summary>
         /// <param name="matrix">Матрица, с которой необходимо произвести сравнение.</param>
         /// <returns>true, если размеры равны; иначе false.</returns>
-        public bool SizeEquals(Matrix matrix) => Rows == matrix.Rows && Columns == matrix.Columns;
+        private bool SizeEquals(Matrix matrix) => Rows == matrix.Rows && Columns == matrix.Columns;
 
         /// <summary>
         /// Заполняет строку значениями.
@@ -129,7 +129,7 @@ namespace MatrixCalculator
         public static Matrix operator -(Matrix firstMatrix, Matrix secondMatrix)
         {
             if (!firstMatrix.SizeEquals(secondMatrix)) 
-                throw new MatrixSizesAreNotEqualException("Матрицы должны быть одного размера.");;
+                throw new MatrixSizesAreNotEqualException("Матрицы должны быть одного размера.");
 
             Matrix resultMatrix = new Matrix(firstMatrix.Rows, firstMatrix.Columns);
             for (int i = 0; i < firstMatrix.Rows; i++)
@@ -191,7 +191,7 @@ namespace MatrixCalculator
         /// <param name="rowIndex">Индекс вычеркиваемой строки.</param>
         /// <param name="columnIndex">Индекс вычеркиваемого столбца.</param>
         /// <returns>Матрица без строки `rowIndex` и без столбца `columnIndex`.</returns>
-        public Matrix GetMinorMatrix(int rowIndex, int columnIndex)
+        private Matrix GetMinorMatrix(int rowIndex, int columnIndex)
         {
             Matrix resultMatrix = new Matrix(Rows - 1, Columns - 1);
             int currentRow = 0;
@@ -245,7 +245,7 @@ namespace MatrixCalculator
         /// <param name="columnIndex">Индекс изменяемого столбца.</param>
         /// <param name="columnValues">Массив значений, на которые необходимо заменить (необязательно).</param>
         /// <returns>Матрица с замененным или удаленным столбцом.</returns>
-        public Matrix ReplaceColumn(int columnIndex, decimal[] columnValues = null)
+        private Matrix ReplaceColumn(int columnIndex, decimal[] columnValues = null)
         {
             int resultColumns = columnValues == null ? Columns - 1 : Columns;
             Matrix resultMatrix = new Matrix(Rows, resultColumns);
@@ -279,7 +279,7 @@ namespace MatrixCalculator
         /// </summary>
         /// <param name="columnIndex">Индекс необходимого столбца.</param>
         /// <returns>Массив значений столбца.</returns>
-        public decimal[] GetColumn(int columnIndex)
+        private decimal[] GetColumn(int columnIndex)
         {
             decimal[] result = new decimal[Columns];
 
