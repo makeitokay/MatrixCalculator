@@ -101,6 +101,7 @@ namespace MatrixCalculator
         /// <param name="additionalMatrix">Ссылка на дополнительную матрицу.</param>
         static void HandleOperation(Operation operation, ref Matrix mainMatrix, ref Matrix additionalMatrix)
         {
+            // TODO: вызывать AskAboutMatrixOverwrite() в этом методе (избавиться от повторяющегося кода)
             try
             {
                 switch (operation)
@@ -353,7 +354,7 @@ namespace MatrixCalculator
                     break;
                 case 3:
                     IsFractionalUsed = !IsFractionalUsed;
-                    MatrixIoHelper.PrintInfoMessage($"Изменения сохранены. " +
+                    MatrixIoHelper.PrintInfoMessage("Изменения сохранены. " +
                                                     $"Теперь генерировать дробные значения {IsFractionalUsedString()}");
                     break;
             }

@@ -8,6 +8,13 @@ namespace MatrixCalculator
         // Ограничение на кол-во строк и столбцов
         private const int MaximumRowsCount = 10;
         private const int MaximumColumnsCount = MaximumRowsCount;
+
+        private static readonly Random _randomInstance;
+        
+        static MatrixIoHelper()
+        {
+            _randomInstance = new Random();
+        }
         
         /// <summary>
         /// Спрашивает у пользователя целое число в необходимом диапазоне.
@@ -82,7 +89,7 @@ namespace MatrixCalculator
             var arrayOfRowElements = row?.Split(" ");
             if (arrayOfRowElements == null)
             {
-                result = Array.Empty<decimal>();
+                result = null;
                 return false;
             }
 
@@ -231,21 +238,19 @@ namespace MatrixCalculator
         /// <returns>Рандомно сгенерированная матрица.</returns>
         public static Matrix GetRandomMatrix()
         {
-            Random randomInstance = new Random();
-
             var resultMatrix = GetEmptyMatrix();
             for (int i = 0; i < resultMatrix.Rows; i++)
             {
                 decimal[] row = new decimal[resultMatrix.Columns];
                 for (int j = 0; j < resultMatrix.Columns; j++)
                 {
-                    bool isFractional = Program.IsFractionalUsed && randomInstance.NextDouble() > 0.5d;
+                    bool isFractional = Program.IsFractionalUsed && _randomInstance.NextDouble() > 0.5d;
                     if (isFractional)
                         row[j] = (decimal) Math.Round(
-                            randomInstance.NextDouble() * (Program.MaxRandomValue - Program.MinRandomValue)
+                            _randomInstance.NextDouble() * (Program.MaxRandomValue - Program.MinRandomValue)
                                                       + Program.MinRandomValue, 2);
                     else
-                        row[j] = randomInstance.Next(Program.MinRandomValue, Program.MaxRandomValue);
+                        row[j] = _randomInstance.Next(Program.MinRandomValue, Program.MaxRandomValue);
                 }
 
                 resultMatrix.SetRow(i, row);

@@ -8,7 +8,8 @@ namespace MatrixCalculator
     /// </summary>
     public class Matrix
     {
-        public int Rows, Columns;
+        public readonly int Rows;
+        public readonly int Columns;
         private decimal[,] _matrix;
         
         /// <summary>
@@ -322,7 +323,7 @@ namespace MatrixCalculator
                     continue;
                 }
                 
-                solveResult[i] = Math.Round(deltaDeterminant / mainDeterminant, 2);
+                solveResult[i] = Math.Round(deltaDeterminant / mainDeterminant, 5);
             }
             
             return mainDeterminant != 0 ? 1d : double.PositiveInfinity;
