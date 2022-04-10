@@ -153,6 +153,8 @@ namespace MatrixCalculator
                     case Operation.SystemOfAlgebraicEquations:
                         HandleSystemOfAlgebraicEquations(ref mainMatrix);
                         break;
+                    default:
+                        return;
                 }
             }
             catch (OverflowException)
